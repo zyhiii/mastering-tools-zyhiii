@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef BUFSIZ
+#undef BUFSIZ
+#define BUFSIZ 4096
+#endif
+
+int main(int argc,char **argv)
+{
+	char buf[BUFSIZ];
+	int msglen;
+	if(argc!=3||strcmp(argv[1],argv[2])==0)
+	/*argc：命令行模式下，输入的参数数目。
+	  argv：第一个参数的首地址。*/
+	{
+		fprintf(stderr,"********************************\n\n");
+		fprintf(stderr,"Please usage:%s source_file destination_file\nAnd source_file is different from destination_file\n\n",argv[0]);
+		fprintf(stderr,"********************************\n");
+		exit(0);
+	}
+	FILE *fp_src,*fp_des;
+	if((fp_src=fopen(argv[1],"r"))==NULL)
+	/*为空，则打开失败*/
+	{
+		fprintf(stderr,"open %s failed!\n",argv[1]);
+		exit(1);
+	}
+	if((fp_des=fopen(argv[2],"w"))==NULL)
+	/*为空，则打开或创建失败*/
+	{
+		fprintf(stderr,"open/create %s failed!\n",argv[2]);
+		exit(2);
+	}
+	while(fgets(buf,BUFSIZ,fp_src)!=NULL)
+	/*从源文件读，读失败或到达文件尾部时，返回NULL*/
+  { 	
+  	if(fputs(buf,fp_des)==EOF)
+  	/*写入目标文件,写入失败时，返回EOF；若成功返回写入的字节数*/
+  	{
+  		fprintf(stderr,"copy %s to %s failed!\n",argv[1],argv[2]);
+  		exit(3);
+	  }
+  }
+  printf("copy %s to %s successful!\n",argv[1],argv[2]);
+  return 0;
+}
